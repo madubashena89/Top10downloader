@@ -14,6 +14,7 @@ class ParseApplications {
         var status = true
         var inEntry = false
         var textValue = ""
+        var gotImage = false
 
         try {
             val factory = XmlPullParserFactory.newInstance()
@@ -24,12 +25,17 @@ class ParseApplications {
             var currentRecord = FeedEntry()
 
             while ( eventType != XmlPullParser.END_DOCUMENT){
-                val tagName = xpp.name.toLowerCase() // TODO : we should use the safe-call operator?
+                val tagName = xpp.name?.toLowerCase()
                 when(eventType){
                     XmlPullParser.START_TAG -> {
                         Log.d(TAG, "parse: Starting tag for " + tagName)
                         if (tagName == "entry"){
                             inEntry = true
+                        } else if ((tagName == "image") && inEntry){
+                            val imageResolution = xpp.getAttributeValue(null, "height")
+                            if (imageResolution.isEmpty()){
+                                gotImage = imageResolution == "53"
+                            }
                         }
                     }
                     XmlPullParser.TEXT -> textValue = xpp.text
